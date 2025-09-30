@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Star, Truck, Shield, Award } from 'lucide-react-native';
@@ -49,11 +49,13 @@ const sellers = [
 
 export default function SellerSelectionScreen() {
   const { productId } = useLocalSearchParams();
-  const [selectedSeller, setSelectedSeller] = useState<number | null>(null);
 
   const handleSellerSelect = (sellerId: number) => {
-    setSelectedSeller(sellerId);
-    router.push(`/seller/${sellerId}?productId=${productId}`);
+    const pId = Array.isArray(productId) ? productId[0] : productId;
+    router.push({
+      pathname: '/buy',
+      params: { productId: pId, sellerId: sellerId.toString() },
+    });
   };
 
   return (
