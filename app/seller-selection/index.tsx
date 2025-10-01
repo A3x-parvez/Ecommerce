@@ -58,6 +58,10 @@ export default function SellerSelectionScreen() {
     });
   };
 
+  const handleViewSellerProfile = (sellerId: number) => {
+    router.push(`/seller/${sellerId}`);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -85,14 +89,7 @@ export default function SellerSelectionScreen() {
         <Text style={styles.sellersTitle}>Available Sellers ({sellers.length})</Text>
         
         {sellers.map((seller) => (
-          <TouchableOpacity
-            key={seller.id}
-            style={[
-              styles.sellerCard,
-              seller.isBestValue && styles.bestValueCard
-            ]}
-            onPress={() => handleSellerSelect(seller.id)}
-          >
+          <View key={seller.id} style={[styles.sellerCard, seller.isBestValue && styles.bestValueCard]}>
             {seller.isBestValue && (
               <LinearGradient
                 colors={['#F59E0B', '#D97706']}
@@ -108,7 +105,9 @@ export default function SellerSelectionScreen() {
             <View style={styles.sellerHeader}>
               <Image source={{ uri: seller.logo }} style={styles.sellerLogo} />
               <View style={styles.sellerDetails}>
-                <Text style={styles.sellerName}>{seller.name}</Text>
+                <TouchableOpacity onPress={() => handleViewSellerProfile(seller.id)}>
+                  <Text style={styles.sellerName}>{seller.name}</Text>
+                </TouchableOpacity>
                 <View style={styles.sellerRating}>
                   <Star size={14} color="#FCD34D" fill="#FCD34D" />
                   <Text style={styles.ratingText}>{seller.rating}</Text>
@@ -163,7 +162,7 @@ export default function SellerSelectionScreen() {
                 <Text style={styles.selectButtonText}>Select Seller</Text>
               </LinearGradient>
             </TouchableOpacity>
-          </TouchableOpacity>
+          </View>
         ))}
       </ScrollView>
     </SafeAreaView>
@@ -287,6 +286,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#1F2937',
     marginBottom: 5,
+    textDecorationLine: 'underline',
   },
   sellerRating: {
     flexDirection: 'row',
