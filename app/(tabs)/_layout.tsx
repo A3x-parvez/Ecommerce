@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Hop as Home, Search, ShoppingCart, User, Package } from 'lucide-react-native';
+import { Home, Search, ShoppingCart, User, Package, Building2 } from 'lucide-react-native';
 
 export default function TabLayout() {
   return (
@@ -25,27 +25,21 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ size, color }) => (
-            <Home size={size} color={color} />
-          ),
+          tabBarIcon: ({ size, color }) => <Home size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="search"
         options={{
           title: 'Search',
-          tabBarIcon: ({ size, color }) => (
-            <Search size={size} color={color} />
-          ),
+          tabBarIcon: ({ size, color }) => <Search size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="cart"
         options={{
           title: 'Cart',
-          tabBarIcon: ({ size, color }) => (
-            <ShoppingCart size={size} color={color} />
-          ),
+          tabBarIcon: ({ size, color }) => <ShoppingCart size={size} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -55,6 +49,13 @@ export default function TabLayout() {
           tabBarIcon: ({ size, color }) => (
             <Package size={size} color={color} />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="wholesale"
+        options={{
+          title: 'Wholesale',
+          tabBarIcon: ({ size, color }) => <Building2 size={size} color={color} />,
         }}
       />
       <Tabs.Screen

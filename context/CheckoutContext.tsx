@@ -1,13 +1,11 @@
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 import { CartItem } from '@/api/dummyData';
 
-// The source tells us where the checkout was initiated from.
 type CheckoutSource = 'cart' | 'buyNow';
 
 interface CheckoutContextType {
   checkoutItems: CartItem[];
   source: CheckoutSource | null;
-  // Function to initiate the checkout process with specific items
   setCheckout: (items: CartItem[], source: CheckoutSource) => void;
   clearCheckout: () => void;
   getCheckoutTotal: () => number;
@@ -53,3 +51,4 @@ export const useCheckout = () => {
   }
   return context;
 };
+

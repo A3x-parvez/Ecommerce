@@ -6,8 +6,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useCart } from '@/context/CartContext';
 import { CartItem } from '@/api/dummyData';
+import { useCheckout } from '@/context/CheckoutContext'; // Import the new hook
+
 
 export default function CartScreen() {
+  const { setCheckout } = useCheckout(); // Get the setCheckout function from the context
   const { cartItems, updateQuantity, removeItem, getCartTotal, getCartSavings } = useCart();
 
   const groupItemsBySeller = () => {
@@ -33,6 +36,9 @@ export default function CartScreen() {
       Alert.alert('Empty Cart', 'Please add some items to cart before checkout');
       return;
     }
+    // --- THIS IS THE FIX ---
+    // Set all cart items for checkout
+    setCheckout(cartItems, 'cart');
     router.push('/checkout');
   };
 

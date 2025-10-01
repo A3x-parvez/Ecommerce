@@ -4,7 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, MapPin, Star, Truck } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
-import { products } from '@/api/dummyData';
+import { products, CartItem } from '@/api/dummyData';
+import { useCheckout } from '@/context/CheckoutContext';
 
 const sellers = [
     {
@@ -38,6 +39,7 @@ const sellers = [
 
 export default function BuyScreen() {
   const { productId, sellerId } = useLocalSearchParams();
+  const { setCheckout } = useCheckout();
   const product = products.find(p => p.id === Number(productId));
   const seller = sellers.find(s => s.id === Number(sellerId));
 
@@ -104,7 +106,20 @@ export default function BuyScreen() {
       </ScrollView>
 
       <View style={styles.bottomContainer}>
-        <TouchableOpacity style={styles.checkoutButton} onPress={() => router.push('/checkout')}>
+        <TouchableOpacity 
+          style={styles.checkoutButton} 
+          onPress={() => {
+            const checkoutItem: CartItem = {
+              ...product,
+              price: seller.price,
+              originalPrice: seller.originalPrice,
+              quantity: 1,
+              seller: seller.name,
+              sellerId: seller.id
+            };
+            setCheckout([checkoutItem], 'buyNow');
+            router.push('/checkout');
+          }}>
           <LinearGradient
             colors={['#8B5CF6', '#14B8A6']}
             start={{ x: 0, y: 0 }}

@@ -448,3 +448,4 @@ const styles = StyleSheet.create({
     color: '#8B5CF6',
   },
 });
+

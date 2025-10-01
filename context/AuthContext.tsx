@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 
 interface User {
+  id: string;
   name: string;
   email: string;
   phone: string;
@@ -19,6 +20,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [user, setUser] = useState<User | null>({
+    id: 'user-123',
     name: 'John Doe',
     email: 'john.doe@example.com',
     phone: '+91 9876543210',

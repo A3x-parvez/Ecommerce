@@ -6,6 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
+import { useCheckout } from '@/context/CheckoutContext';
 import { api, OrderPayload } from '@/api';
 
 const dummyAddresses = [
@@ -35,36 +36,49 @@ const paymentMethods = [
 export default function CheckoutScreen() {
     const { user } = useAuth();
     const { cartItems, getCartTotal, getCartSavings, clearCart } = useCart();
+    const { checkoutItems, source, getCheckoutTotal, getCheckoutSavings, clearCheckout } = useCheckout();
     const [selectedPayment, setSelectedPayment] = useState('Credit Card');
     const [addressModalVisible, setAddressModalVisible] = useState(false);
     const [selectedAddress, setSelectedAddress] = useState(dummyAddresses[0]);
     const [isPlacingOrder, setIsPlacingOrder] = useState(false);
 
-    const cartTotal = getCartTotal();
-    const cartSavings = getCartSavings();
+    // Use checkout items if they exist, otherwise use cart items
+    const items = source === 'buyNow' ? checkoutItems : cartItems;
+    const total = source === 'buyNow' ? getCheckoutTotal() : getCartTotal();
+    const savings = source === 'buyNow' ? getCheckoutSavings() : getCartSavings();
 
     const handlePlaceOrder = async () => {
         if (isPlacingOrder) return;
 
         setIsPlacingOrder(true);
 
+        if (!user) {
+            Alert.alert('Authentication Required', 'Please log in to place an order.');
+            return;
+        }
+
         const orderPayload: OrderPayload = {
-            userId: 'user-123', // Dummy user ID from auth context
+            userId: user.id,
             address: selectedAddress,
-            items: cartItems,
+            items: items,
             paymentMethod: selectedPayment,
-            subtotal: cartTotal + cartSavings,
-            discount: cartSavings,
-            total: cartTotal,
+            subtotal: total + savings,
+            discount: savings,
+            total: total,
         };
 
         try {
             const result = await api.placeOrder(orderPayload);
             if (result.success) {
                 clearCart();
+                if (source === 'buyNow') {
+                    clearCheckout();
+                } else {
+                    clearCart();
+                }
                 router.replace({
                     pathname: '/order-success',
-                    params: { orderId: result.orderId, total: cartTotal }
+                    params: { orderId: result.orderId, total: total }
                 });
             } else {
                 Alert.alert('Order Failed', 'Something went wrong. Please try again.');
@@ -197,12 +211,12 @@ export default function CheckoutScreen() {
                     <View style={styles.priceBreakdown}>
                         <Text style={styles.breakdownTitle}>Price Details</Text>
                         <View style={styles.breakdownRow}>
-                            <Text style={styles.breakdownLabel}>Subtotal ({cartItems.length} items)</Text>
-                            <Text style={styles.breakdownValue}>₹{cartTotal.toLocaleString()}</Text>
+                            <Text style={styles.breakdownLabel}>Subtotal ({items.length} items)</Text>
+                            <Text style={styles.breakdownValue}>₹{total.toLocaleString()}</Text>
                         </View>
                         <View style={styles.breakdownRow}>
                             <Text style={styles.breakdownLabel}>Discount</Text>
-                            <Text style={[styles.breakdownValue, styles.savingsText]}>-₹{cartSavings.toLocaleString()}</Text>
+                            <Text style={[styles.breakdownValue, styles.savingsText]}>-₹{savings.toLocaleString()}</Text>
                         </View>
                         <View style={styles.breakdownRow}>
                             <Text style={styles.breakdownLabel}>Delivery Charges</Text>
@@ -210,7 +224,7 @@ export default function CheckoutScreen() {
                         </View>
                         <View style={styles.totalRow}>
                             <Text style={styles.totalLabel}>Total Amount</Text>
-                            <Text style={styles.totalValue}>₹{cartTotal.toLocaleString()}</Text>
+                            <Text style={styles.totalValue}>₹{total.toLocaleString()}</Text>
                         </View>
                     </View>
                 </View>
@@ -219,7 +233,7 @@ export default function CheckoutScreen() {
             {/* Bottom Bar */}
             <View style={styles.bottomContainer}>
                 <View style={styles.totalContainer}>
-                    <Text style={styles.totalText}>₹{cartTotal.toLocaleString()}</Text>
+                    <Text style={styles.totalText}>₹{total.toLocaleString()}</Text>
                     <Text style={styles.viewDetailsText}>View Details</Text>
                 </View>
                 <TouchableOpacity style={styles.checkoutButton} onPress={handlePlaceOrder} disabled={isPlacingOrder}>
